@@ -4,6 +4,7 @@ Runs immediately on start, then every 30 minutes.
 """
 
 import logging
+import re
 import subprocess
 import time
 
@@ -18,6 +19,19 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+
+def cleanup_no_tickers():
+    deleted = 0
+    for f in DEFAULT_CLIPPINGS_DIR.glob("tweet_*.md"):
+        try:
+            text = f.read_text(encoding="utf-8")
+            if re.search(r'^tickers:\s*\[\s*\]', text, re.MULTILINE):
+                f.unlink()
+                deleted += 1
+        except Exception as e:
+            logger.error("Error checking %s: %s", f.name, e)
+    logger.info("Deleted %d clipping(s) with no tickers", deleted)
 
 
 def push_clippings():
@@ -45,6 +59,7 @@ def run_all():
             logger.error("Setup required for @%s: %s", account.handle, e)
         except Exception as e:
             logger.error("Error scraping @%s: %s", account.handle, e)
+    cleanup_no_tickers()
     push_clippings()
 
 
