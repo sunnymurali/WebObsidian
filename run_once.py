@@ -4,6 +4,7 @@ Run this once a day when you turn on your PC.
 """
 
 import logging
+import re
 import subprocess
 from config import ACCOUNTS, DEFAULT_CLIPPINGS_DIR
 from scraper import scrape
@@ -14,6 +15,22 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+
+def cleanup_no_tickers():
+    deleted = 0
+    for f in DEFAULT_CLIPPINGS_DIR.glob("tweet_*.md"):
+        try:
+            text = f.read_text(encoding="utf-8")
+            match = re.search(r'^tickers:\s*\[\s*\]', text, re.MULTILINE)
+            if match:
+                f.unlink()
+                deleted += 1
+                logger.debug("Deleted (no tickers): %s", f.name)
+        except Exception as e:
+            logger.error("Error checking %s: %s", f.name, e)
+    logger.info("Deleted %d clipping(s) with no tickers", deleted)
+    return deleted
 
 
 def main():
@@ -31,6 +48,8 @@ def main():
 
     logger.info("────────────────────────────────────────────────")
     logger.info("Total new clippings: %d", total)
+
+    cleanup_no_tickers()
 
     # Push to GitHub
     try:
