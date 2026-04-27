@@ -1,0 +1,27 @@
+# Credentials / session data — never commit
+session.json
+x_cookies.json
+*.json
+!requirements.txt
+
+# Browser profile data
+browser_profile/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
