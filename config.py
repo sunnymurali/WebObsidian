@@ -13,7 +13,7 @@ class AccountConfig:
     handle: str
     place: str = "posts"        # "posts" → main profile timeline
                                 # "subs"  → creator subscriptions feed
-    max_tweets: int = 55
+    max_tweets: int = 100
     clippings_dir: Optional[Path] = None  # None uses DEFAULT_CLIPPINGS_DIR
 
     @property
