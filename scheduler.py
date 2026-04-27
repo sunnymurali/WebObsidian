@@ -4,11 +4,12 @@ Runs immediately on start, then every 30 minutes.
 """
 
 import logging
+import subprocess
 import time
 
 import schedule
 
-from config import ACCOUNTS
+from config import ACCOUNTS, DEFAULT_CLIPPINGS_DIR
 from scraper import scrape
 
 logging.basicConfig(
@@ -17,6 +18,21 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+
+def push_clippings():
+    try:
+        repo = str(DEFAULT_CLIPPINGS_DIR)
+        subprocess.run(["git", "-C", repo, "add", "*.md"], check=True)
+        result = subprocess.run(["git", "-C", repo, "diff", "--cached", "--quiet"])
+        if result.returncode != 0:
+            subprocess.run(["git", "-C", repo, "commit", "-m", "New clippings"], check=True)
+            subprocess.run(["git", "-C", repo, "push"], check=True)
+            logger.info("Clippings pushed to GitHub")
+        else:
+            logger.info("No new clippings to push")
+    except Exception as e:
+        logger.error("Git push failed: %s", e)
 
 
 def run_all():
@@ -29,6 +45,7 @@ def run_all():
             logger.error("Setup required for @%s: %s", account.handle, e)
         except Exception as e:
             logger.error("Error scraping @%s: %s", account.handle, e)
+    push_clippings()
 
 
 if __name__ == "__main__":

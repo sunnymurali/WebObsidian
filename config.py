@@ -28,7 +28,7 @@ class AccountConfig:
 
 # ── Add or remove accounts here ──────────────────────────────────
 ACCOUNTS: list[AccountConfig] = [
-    AccountConfig(handle="OptionsHawk",      place="subs"),
+    AccountConfig(handle="OptionsHawk",      place="posts"),
     AccountConfig(handle="3PeaksTrading",    place="posts"),
     AccountConfig(handle="investwithrules",  place="posts"),
     AccountConfig(handle="LeifSoreide",      place="posts"),
